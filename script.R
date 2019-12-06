@@ -25,8 +25,9 @@ server <- function(input, output) {
     names(data_frame1) <- c("date")
     data_frame2 <- data.frame(high = 0, low = 0, open = 1:length(unique_dates), close = 0)
     data_frame3 <- cbind(data_frame1, data_frame2)
-    data_frame4 <- data.frame(matrix(NA_real_, nrow = length(unique_dates), ncol = 24))
+    data_frame4 <- data.frame(matrix(NA_real_, nrow = length(unique_dates), ncol = 25))
     data_frame <- cbind(data_frame3, data_frame4)
+    averages <- cbind(data_frame1, data.frame(matrix(0, nrow = length(unique_dates), ncol = 2)))
     # Importing sensor data into the main data frame
     for (i in 1:(length(data[,1]))) {
       date <- data[[i,1]]
@@ -37,6 +38,7 @@ server <- function(input, output) {
             if (is.na(data_frame[j,l])) {
               # Xnum
               data_frame[j,l] <- 100 - data[i,1 + input$num]
+              averages[j,2] <- averages[j,2] + data_frame[j,l]
               # Open
               if (l == 6) {
                 data_frame[j,4] <- data_frame[j,l]
@@ -51,11 +53,15 @@ server <- function(input, output) {
               }
               # Close
               data_frame[j,5] <- data_frame[j,l]
+              averages[j,3] <- averages[j,3] + 1
               break
             }
           }
         }
       }
+    }
+    for (i in 1:length(unique_dates)) {
+      data_frame[i,30] <- averages[i,2] / averages[i,3]
     }
     print(num)
     # Plotting candlestick chart
@@ -63,13 +69,49 @@ server <- function(input, output) {
     colors <- ifelse(data_frame$close >= data_frame$open, "green3", "firebrick1")
     par(mar = c(6, 3, 2, 2))
     plot(data_frame$high, main = paste("Sensor", input$num, "and", input$indicator, sep = " "), xaxt = "n", xlab = "", ylab = "Water Potential", ylim = c(min(data_frame$low), max(data_frame$high)), type = "n")
-    par(new = T)
-    plot(data_frame$low, axes = FALSE, xlab = "", ylab = "", ylim=c(min(data_frame$low), max(data_frame$high)), type = "n")
+    #par(new = T)
+    #plot(data_frame$low, axes = FALSE, xlab = "", ylab = "", ylim=c(min(data_frame$low), max(data_frame$high)), type = "n")
     segments(x0 = x, y0 = data_frame$open, x1 = x, y1 = data_frame$close, col = colors, lwd = 5)
     segments(x0 = x, y0 = data_frame$low, x1 = x, y1 = data_frame$high, col = colors, lwd = 1)
     axis(1, at = x, labels = data_frame$date, las = 2)
-    # Plotting SMA
+    # Plotting SMA (5 and 21)
     if (input$indicator == "Simple Moving Average") {
+      sma5 <- c(0)
+      sma21 <- c(0)
+      if (length(unique_dates) >= 5) {
+        avg <- 0.0
+        for (i in 1:5) {
+          avg <- avg + data_frame[i,30]
+        }
+        sma5[1] <- avg / 5.0
+        print("TEST")
+        print(sma5[1])
+        for (i in 2:(length(unique_dates) - 4)) {
+          add <- data_frame[i+4,30] - data_frame[i-1,30]
+          avg <- avg + add
+          sma5[i] <- (avg/5)
+        }
+        x <- c(1:(length(sma5)-1))
+        z <- c(2:(length(sma5)))
+        segments(x0 = x + 4, y0 = sma5[x], x1 = x + 5, y1 = sma5[x+1], lwd = 2, col = "orange")
+      }
+      if (length(unique_dates) >= 21) {
+        avg <- 0.0
+        for (i in 1:21) {
+          avg <- avg + data_frame[i,30]
+        }
+        sma21[1] <- avg / 21.0
+        print("TEST")
+        print(sma5[1])
+        for (i in 2:(length(unique_dates) - 20)) {
+          add <- data_frame[i+20,30] - data_frame[i-1,30]
+          avg <- avg + add
+          sma21[i] <- (avg/21)
+        }
+        x <- c(1:(length(sma21)-1))
+        z <- c(2:(length(sma21)))
+        segments(x0 = x + 20, y0 = sma21[x], x1 = x + 21, y1 = sma21[x+1], lwd = 2, col = "lightslateblue")
+      }
     }
   })
 }
