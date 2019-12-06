@@ -79,6 +79,7 @@ server <- function(input, output) {
       sma5 <- c(0)
       sma21 <- c(0)
       if (length(unique_dates) >= 5) {
+        # Calculation of 5 day SMA
         avg <- 0.0
         for (i in 1:5) {
           avg <- avg + data_frame[i,30]
@@ -96,8 +97,9 @@ server <- function(input, output) {
         segments(x0 = x + 4, y0 = sma5[x], x1 = x + 5, y1 = sma5[x+1], lwd = 2, col = "orange")
       }
       if (length(unique_dates) >= 21) {
+        # Calculation of 21 day SMA
         avg <- 0.0
-        for (i in 1:21) {
+        for (i in 1:21) { 
           avg <- avg + data_frame[i,30]
         }
         sma21[1] <- avg / 21.0
@@ -111,6 +113,37 @@ server <- function(input, output) {
         x <- c(1:(length(sma21)-1))
         z <- c(2:(length(sma21)))
         segments(x0 = x + 20, y0 = sma21[x], x1 = x + 21, y1 = sma21[x+1], lwd = 2, col = "lightslateblue")
+      }
+    } else if (input$indicator == "Exponential Moving Average") {
+      ema5 <- c(0)
+      ema21 <- c(0)
+      if (length(unique_dates) >= 5) {
+        # Calculation of 5 day EMA
+        ema <- 0.0
+        for (i in 1:5) {
+          ema <- ema + data_frame[i,30]
+        }
+        ema5[1] <- ema / 5.0
+        for (i in 2:(length(unique_dates) - 4)) {
+          ema5[i] <- data_frame[i,30] * (2/6) + ema5[i - 1] * (4/6)
+        }
+        x <- c(1:(length(ema5)-1))
+        z <- c(2:(length(ema5)))
+        segments(x0 = x + 4, y0 = ema5[x], x1 = x + 5, y1 = ema5[x+1], lwd = 2, col = "orange")
+      }
+      if (length(unique_dates) >= 21) {
+        # Calculation of 21 day EMA
+        ema <- 0.0
+        for (i in 1:21) {
+          ema <- ema + data_frame[i,30]
+        }
+        ema21[1] <- ema / 21.0
+        for (i in 2:(length(unique_dates) - 20)) {
+          ema21[i] <- data_frame[i,30] * (2/22) + ema21[i - 1] * (20/22)
+        }
+        x <- c(1:(length(ema21)-1))
+        z <- c(2:(length(ema21)))
+        segments(x0 = x + 20, y0 = ema21[x], x1 = x + 21, y1 = ema21[x+1], lwd = 2, col = "lightslateblue")
       }
     }
   })
