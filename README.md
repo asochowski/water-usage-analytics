@@ -1,6 +1,6 @@
 # water-usage-analytics
 
-![alt text](https://pasteboard.co/IK1IhDM.png)
+![image](https://pasteboard.co/IK1IhDM.png)
 
 Plots water potential data into a candlestick plot and plots stock technical analysis indicators to help visualize critical points in the water data.
 
