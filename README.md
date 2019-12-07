@@ -1,6 +1,6 @@
 # water-usage-analytics
 
-![image](thumbnail.png)
+![image](thumbnail.PNG)
 
 **REQUIRES INSTALLATION OF THE R SHINY LIBRARY**
 
