@@ -13,3 +13,4 @@ This tool was made for a research position I held during my freshman year.
 **To do list:**
 - Add functionality to import custom data
 - Make an executable bat file to easily open the application
+- Fix performance issues
