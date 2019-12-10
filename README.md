@@ -11,6 +11,7 @@ For instructions on how input data should be formatted, please refer to "data2.c
 This tool was made for a research position I held during my freshman year.
 
 **To do list:**
-- ~~Add functionality to import custom data~~
-- Make an executable file to easily open the application
-- Fix performance issues
+- ~~Add functionality to import custom data.~~
+- Make an executable file to easily open the application.
+- Variable number of sensors support.
+- Fix performance issues.
