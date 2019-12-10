@@ -1,14 +1,15 @@
 library(shiny)
-# Importing CSV data
-data<- read.csv("data2.csv",header=TRUE)
-# Gathering the list of unique dates in the CSV data
-unique_dates <- as.list(levels(unique(data[,1])))
 # Shiny setup
 ui <- fluidPage(
   headerPanel("Water Usage Analytics"),
   sidebarPanel(
+    fileInput("file", "Choose CSV File",
+              multiple = TRUE,
+              accept = c("text/csv",
+                         "text/comma-separated-values,text/plain",
+                         ".csv")),
     sliderInput(inputId = "num", label = "Choose a sensor", value = 1, min = 1, max = 3),
-    selectInput("indicator", "Indicator", list("None", "Simple Moving Average", "Exponential Moving Average",
+    selectInput("indicator", "Choose an indicator", list("None", "Simple Moving Average", "Exponential Moving Average",
                                                "Boellinger Bands", "Commodity Channel Index", "MACD", 
                                                "Rate of Change", "Stochastic Momentum Index", "Williams %R"))
   ),
@@ -18,6 +19,11 @@ ui <- fluidPage(
 )
 server <- function(input, output) {
   output$myplot <- renderPlot({
+    # Importing CSV data
+    data<- read.csv(input$file$datapath,header=TRUE)
+    print(data)
+    # Gathering the list of unique dates in the CSV data
+    unique_dates <- as.list(levels(unique(data[,1])))
     # Setting up the structure of the data frame
     data_frame1 <- do.call(rbind, lapply(unique_dates, as.data.frame))
     names(data_frame1) <- c("date")
@@ -61,7 +67,6 @@ server <- function(input, output) {
     for (i in 1:length(unique_dates)) {
       data_frame[i,30] <- averages[i,2] / averages[i,3]
     }
-    print(num)
     # Plotting candlestick chart
     x <- c(1:nrow(data_frame))
     colors <- ifelse(data_frame$close >= data_frame$open, "green3", "firebrick1")
